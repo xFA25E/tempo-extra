@@ -1,10 +1,17 @@
-#+TITLE: tempo-abbrev
+#+TITLE: tempo-extra
 
-This package provides tempo templates for various modes.
+This package provides additional tempo configurations and templates for various
+modes.
 
 * Usage and Example Configuration
-
 #+begin_src elisp
+(with-eval-after-load 'tempo
+  (define-key goto-map "\M-e" 'tempo-forward-mark)
+  (define-key goto-map "\M-a" 'tempo-backward-mark))
+
+(with-eval-after-load 'abbrev-hook
+  (define-key global-map "\C-z" 'abbrev-hook-call))
+
 (with-eval-after-load 'csharp-mode (require 'tempo-extra-csharp))
 (with-eval-after-load 'elisp-mode (require 'tempo-extra-elisp))
 (with-eval-after-load 'js (require 'tempo-extra-js))
@@ -12,6 +19,125 @@ This package provides tempo templates for various modes.
 (with-eval-after-load 'nix-mode (require 'tempo-extra-nix))
 (with-eval-after-load 'org (require 'tempo-extra-org))
 #+end_src
+
+* Features
+
+** Templates
+
+*** Csharp
+- ~tempo-template-csharp-PropertyChangedProperty~ currently does not have an
+  abbrev.
+
+*** Elisp
+- ~defvar~
+- ~defun~
+- ~defgroup~
+- ~defcustom~
+- ~defface~
+- ~ert-deftest~
+
+*** Js
+- ~switch~
+- ~function~
+- ~if~
+- ~for~
+- ~try~
+- ~clog~
+- ~ctime~
+
+*** Lisp
+- ~lambda~
+- ~let~
+- ~defvar~
+- ~defun~
+- ~defpackage~
+- ~defsystem~
+
+*** Nix
+- ~fetchurl~
+- ~fetchzip~
+- ~fetchgit~
+- ~fetchFromGitHub~
+
+*** Org
+- ~changelog~ prepares a new changelog entry with *Unreleased* date
+- ~Unreleased~ used to release a changelog entry with *Unreleased* date
+
+** ~tempo-extra-define~
+This is a definition function for tempo templates that uses /abbrev-hook/
+internally.  For example usage, see files.
+
+** Tempo user elements
+This package provides ~tempo-extra-user-elements~ function which adds some new
+elements to tempo languag.
+
+*** Skeleton elements
+Conditional and looping constructs similar to /skeleton/ ones, making skeleton
+pretty much obsolete.  For example, the following snippets are almost
+equivalent:
+
+#+begin_src elisp
+(define-skeleton someskel "Docs."
+  nil
+  "(:option"
+  ("Insert symbol: " " #:" str)
+  ")")
+
+(tempo-define-template
+ "sometemp"
+ '("(:option"
+   (:while ("Insert symbol: " sym)
+           " #:" (s sym))
+   ")"))
+#+end_src
+
+Some more complicated behavior:
+
+#+begin_src elisp
+(define-skeleton someskel "Docs."
+  nil
+  "(:option"
+  ;; insert until empty string is given
+  ("Insert symbol: " " #:" str)
+  & ")"
+  ;; or don't insert at all.  It is a hack that physically removes "(:option"
+  ;; string by deleting 8 characters if previous statements didn't move the
+  ;; point
+  | -8)
+
+(tempo-define-template "sometemp"
+  ;; If input was not empty, start inserting
+  '((:when ("Insert symbol: " sym)
+           "(:option #:" (s sym)
+           ;; Continue inserting until empty string is given
+           (:while ("Insert symbol: " sym)
+                   " #:" (s sym))
+           ")")))
+#+end_src
+
+There is also an ~:if~ element, that can execute *else* branch if input was
+empty.
+
+#+begin_src elisp
+(tempo-define-template "sometemp"
+  '((:if ("Insert symbol: " sym)
+         ;; Use l element to group elements together
+         (l "insert " (s sym))
+         "something else")))
+#+end_src
+
+*** E/Lisp elements
+- ~:with-parens~ which places parens around body if there were none.  This is
+  used to have identical abbrev expansion for ~if~ and ~(if)~.
+- ~:elisp-namespace~ returns the current elisp namespace (for package).
+- ~:elisp-prefix~ returns the current elisp prefix.  It is usually an
+  ~:elisp-namespace~ plus a dash, but it respects ~read-symbol-shorthands~.
+- ~:elisp-group~ is ~:elisp-namespace~ without ~-mode~.
+
+*** Other
+- ~:nix-hash~ returns a fake /nix/ sha256 hash.
+- ~:changelog-last-version~ returns last version in changelog in /org/ format.
+- ~:date~ returns current date in ~yyyy-MM-dd~ format.
 
 * Installation
 
@@ -41,9 +167,9 @@ If you've installed it with your package manager, you're done.
 
 Install these required packages:
 
-+ abbrev-hook
++ [[https://github.com/xFA25E/abbrev-hook][abbrev-hook]]
 
-hen put .el files in your load-path
+Then put .el files in your load-path
 
 * Development
 Bug reports, feature requests and suggestions are, of course, welcome!
