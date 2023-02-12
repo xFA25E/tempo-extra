@@ -27,6 +27,13 @@
 
 ;;;; Usage and Example Configuration
 
+;; (with-eval-after-load 'tempo
+;;   (define-key goto-map "\M-e" 'tempo-forward-mark)
+;;   (define-key goto-map "\M-a" 'tempo-backward-mark))
+
+;; (with-eval-after-load 'abbrev-hook
+;;   (define-key global-map "\C-z" 'abbrev-hook-call))
+
 ;; (with-eval-after-load 'csharp-mode (require 'tempo-extra-csharp))
 ;; (with-eval-after-load 'elisp-mode (require 'tempo-extra-elisp))
 ;; (with-eval-after-load 'js (require 'tempo-extra-js))
