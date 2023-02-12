@@ -23,26 +23,26 @@
 
 (require 'tempo-extra)
 
-(tempo-extra-define "fetchurl" 'nix-mode
+(te-define "fetchurl" 'nix-mode
   '("fetchurl {" n>
     "url = \"" p "\";" n>
     "hash = \"" p :nix-hash "\";" n>
     "}" p >))
 
-(tempo-extra-define "fetchzip" 'nix-mode
+(te-define "fetchzip" 'nix-mode
   '("fetchzip {" n>
     "url = \"" p "\";" n>
     "hash = \"" p :nix-hash "\";" n>
     "}" p >))
 
-(tempo-extra-define "fetchgit" 'nix-mode
+(te-define "fetchgit" 'nix-mode
   '("fetchgit {" n>
     "url = \"" p "\";" n>
     "rev = \"" p "\";" n>
     "hash = \"" p :nix-hash "\";" n>
     "}" p >))
 
-(tempo-extra-define "fetchFromGitHub" 'nix-mode
+(te-define "fetchFromGitHub" 'nix-mode
   '("fetchFromGitHub {" n>
     "owner = \"" p "\";" n>
     "repo = \"" p "\";" n>
@@ -51,4 +51,9 @@
     "}" p >))
 
 (provide 'tempo-extra-nix)
+
+;; Local Variables:
+;; read-symbol-shorthands: (("te-" . "tempo-extra-"))
+;; End:
+
 ;;; tempo-extra-nix.el ends here

@@ -23,34 +23,34 @@
 
 (require 'tempo-extra)
 
-(defun tempo-extra-lisp-enable ()
+(defun te-lisp-enable ()
   "Enable function for Lisp abbrev table."
   (or (eq this-command 'expand-abbrev) (eql ?\s last-command-event)))
 
 (define-abbrev-table (abbrev-hook-abbrev-table 'lisp-mode)
-  nil :enable-function #'tempo-extra-lisp-enable)
+  nil :enable-function #'te-lisp-enable)
 
-(tempo-extra-define "lambda" 'lisp-mode
+(te-define "lambda" 'lisp-mode
   '((:with-parens "lambda (" p ") " r>)))
 
-(tempo-extra-define "let" 'lisp-mode
+(te-define "let" 'lisp-mode
   '((:with-parens
      "let ((" p "))" n>
      r>)))
 
-(tempo-extra-define "defvar" 'lisp-mode
+(te-define "defvar" 'lisp-mode
   '((:with-parens
      "defvar " p n>
      r> n>
      "\"" p "\"")))
 
-(tempo-extra-define "defun" 'lisp-mode
+(te-define "defun" 'lisp-mode
   '((:with-parens
      "defun " p " (" p ")" n>
      "\"" p "\"" n>
      r>)))
 
-(tempo-extra-define "defpackage" 'lisp-mode
+(te-define "defpackage" 'lisp-mode
   '((:with-parens
      "defpackage #:" (P "Package name: " package) n>
      "(:use #:cl)" n>
@@ -77,7 +77,7 @@
      "(:documentation \"" (P "Documentation: ") "\"))" n>
      "(in-package #:" (s package) ")" n>)))
 
-(tempo-extra-define "defsystem" 'lisp-mode
+(te-define "defsystem" 'lisp-mode
   '((:with-parens
      "defsystem \"" (P "System: " system) "\"" n>
      (:when ("Long name: " long-name) ":long-name \"" (s long-name) "\"" n>)
@@ -105,4 +105,9 @@
      ":perform (test-op (op c) (symbol-call '#:fiveam '#:run! (find-symbol* '#:" (s system) " '#:" (s system) ".tests)))")))
 
 (provide 'tempo-extra-lisp)
+
+;; Local Variables:
+;; read-symbol-shorthands: (("te-" . "tempo-extra-"))
+;; End:
+
 ;;; tempo-extra-lisp.el ends here

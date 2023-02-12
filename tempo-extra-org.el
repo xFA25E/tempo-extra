@@ -23,7 +23,7 @@
 
 (require 'tempo-extra)
 
-(tempo-extra-define "changelog" 'org-mode
+(te-define "changelog" 'org-mode
   '("** [" :changelog-last-version p "] - Unreleased" n n
     "*** Added" n n
     "*** Changed" n n
@@ -32,7 +32,12 @@
     "*** Fixed" n n
     "*** Security"))
 
-(tempo-extra-define "Unreleased" 'org-mode '(:date))
+(te-define "Unreleased" 'org-mode '(:date))
 
 (provide 'tempo-extra-org)
+
+;; Local Variables:
+;; read-symbol-shorthands: (("te-" . "tempo-extra-"))
+;; End:
+
 ;;; tempo-extra-org.el ends here

@@ -24,27 +24,27 @@
 (require 'tempo-extra-lisp)
 
 (define-abbrev-table (abbrev-hook-abbrev-table 'emacs-lisp-mode)
-  nil :enable-function #'tempo-extra-lisp-enable)
+  nil :enable-function #'te-lisp-enable)
 
-(tempo-extra-define "defvar" 'emacs-lisp-mode
+(te-define "defvar" 'emacs-lisp-mode
   '((:with-parens
      "defvar " :elisp-prefix p n>
      r> n>
      "\"" p "\"")))
 
-(tempo-extra-define "defun" 'emacs-lisp-mode
+(te-define "defun" 'emacs-lisp-mode
   '((:with-parens
      "defun " :elisp-prefix p " (" p ")" n>
      "\"" p "\"" n>
      r>)))
 
-(tempo-extra-define "defgroup" 'emacs-lisp-mode
+(te-define "defgroup" 'emacs-lisp-mode
   '((:with-parens
      "defgroup " :elisp-group " nil" n>
      "\"" p "\"" n>
      ":group " p "nil")))
 
-(tempo-extra-define "defcustom" 'emacs-lisp-mode
+(te-define "defcustom" 'emacs-lisp-mode
   '((:with-parens
      "defcustom " :elisp-prefix p n>
      r> n>
@@ -52,17 +52,22 @@
      ":type " p "nil" n>
      ":group '" :elisp-group)))
 
-(tempo-extra-define "defface" 'emacs-lisp-mode
+(te-define "defface" 'emacs-lisp-mode
   '((:with-parens
      "defface " :elisp-prefix p n>
      "'((t :inherit " p "nil))" n>
      "\"" p "\"" n>
      ":group '" :elisp-group)))
 
-(tempo-extra-define "ert-deftest" 'emacs-lisp-mode
+(te-define "ert-deftest" 'emacs-lisp-mode
   '((:with-parens
      "ert-deftest " :elisp-prefix p " ()" n>
      r>)))
 
 (provide 'tempo-extra-elisp)
+
+;; Local Variables:
+;; read-symbol-shorthands: (("te-" . "tempo-extra-"))
+;; End:
+
 ;;; tempo-extra-elisp.el ends here

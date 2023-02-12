@@ -5,7 +5,7 @@
 ;; Author: Valeriy Litkovskyy <vlr.ltkvsk@protonmail.com>
 ;; URL: https://github.com/xFA25E/tempo-extra
 ;; Version: 0.0.1
-;; Package-Requires: ((emacs "25.1") (abbrev-hook "0.0.1"))
+;; Package-Requires: ((emacs "28.1") (abbrev-hook "0.0.1"))
 ;; Keywords: abbrev, convenience
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -63,7 +63,7 @@
 (require 'subr-x)
 (require 'tempo)
 
-(defun tempo-extra-define (name mode elements)
+(defun te-define (name mode elements)
   "Define tempo template with abbrev-hook.
 NAME is an abbrev name as in `define-abbrev'.  MODE can be a
 symbol of some major mode or nil.  If MODE is nil, a global
@@ -76,7 +76,7 @@ template will be defined.  ELEMENTS is a tempo template as in
     (cl-callf byte-compile (symbol-function hook))
     (abbrev-hook-define name mode hook)))
 
-(defun tempo-extra-user-elements (element)
+(defun te-user-elements (element)
   "Additional user elements.
 For ELEMENT see `tempo-define-template'."
   (pcase element
@@ -111,7 +111,7 @@ For ELEMENT see `tempo-define-template'."
        (replace-regexp-in-string (rx bos (* "-")) "")))
 
     (:elisp-prefix
-     (let ((prefix (concat (tempo-extra-user-elements :elisp-namespace) "-")))
+     (let ((prefix (concat (te-user-elements :elisp-namespace) "-")))
        (or (when (bound-and-true-p read-symbol-shorthands)
              (car (cl-find prefix read-symbol-shorthands
                            :key #'cdr :test #'string=)))
@@ -119,7 +119,7 @@ For ELEMENT see `tempo-define-template'."
 
     (:elisp-group
      (thread-last :elisp-namespace
-       tempo-extra-user-elements
+       te-user-elements
        (string-remove-suffix "-mode")))
 
     ;; Nix
@@ -135,10 +135,14 @@ For ELEMENT see `tempo-define-template'."
 
     (:date (format-time-string "%Y-%m-%d"))))
 
-(add-hook 'tempo-user-elements #'tempo-extra-user-elements)
+(add-hook 'tempo-user-elements #'te-user-elements)
 
 ;;;; Footer
 
 (provide 'tempo-extra)
+
+;; Local Variables:
+;; read-symbol-shorthands: (("te-" . "tempo-extra-"))
+;; End:
 
 ;;; tempo-extra.el ends here

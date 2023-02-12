@@ -23,7 +23,7 @@
 
 (require 'tempo-extra)
 
-(tempo-extra-define "switch" 'js-mode
+(te-define "switch" 'js-mode
   '("switch (" p ") {" n>
     (:while ("Pattern: " pat)
             "case " (s pat) ":" > n>
@@ -34,34 +34,39 @@
     "break;" n>
     "}" >))
 
-(tempo-extra-define "function" 'js-mode
+(te-define "function" 'js-mode
   '("function " p "(" p ") {" n>
     r> n>
     "}" >))
 
-(tempo-extra-define "if" 'js-mode
+(te-define "if" 'js-mode
   '("if (" p ") {" n>
     r> n>
     "}" >))
 
-(tempo-extra-define "for" 'js-mode
+(te-define "for" 'js-mode
   '("for (" p ") {" n>
     r> n>
     "}" >))
 
-(tempo-extra-define "try" 'js-mode
+(te-define "try" 'js-mode
   '("try {" n>
     r> n>
     "} catch (" p "error) {" > n>
     p n>
     "}" >))
 
-(tempo-extra-define "clog" 'js-mode '("console.log(" r ")"))
+(te-define "clog" 'js-mode '("console.log(" r ")"))
 
-(tempo-extra-define "ctime" 'js-mode
+(te-define "ctime" 'js-mode
   '("console.time(\"" (P "Time name: " time) "\");" > n>
     r> n>
     "console.timeEnd(\"" (s time) "\");" >))
 
 (provide 'tempo-extra-js)
+
+;; Local Variables:
+;; read-symbol-shorthands: (("te-" . "tempo-extra-"))
+;; End:
+
 ;;; tempo-extra-js.el ends here
