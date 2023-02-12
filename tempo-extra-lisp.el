@@ -23,6 +23,10 @@
 
 (require 'tempo-extra)
 
+(defun tempo-extra-lisp-enable ()
+  "Enable function for Lisp abbrev table."
+  (or (eq this-command 'expand-abbrev) (eql ?\s last-command-event)))
+
 (define-abbrev-table (abbrev-hook-abbrev-table 'lisp-mode)
   nil :enable-function #'tempo-extra-lisp-enable)
 

@@ -21,7 +21,7 @@
 
 ;;; Code:
 
-(require 'tempo-extra)
+(require 'tempo-extra-lisp)
 
 (define-abbrev-table (abbrev-hook-abbrev-table 'emacs-lisp-mode)
   nil :enable-function #'tempo-extra-lisp-enable)

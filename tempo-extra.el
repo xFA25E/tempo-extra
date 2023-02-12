@@ -69,10 +69,6 @@ template will be defined.  ELEMENTS is a tempo template as in
     (cl-callf byte-compile (symbol-function hook))
     (abbrev-hook-define name mode hook)))
 
-(defun tempo-extra-lisp-enable ()
-  "Enable function for Lisp abbrev table."
-  (or (eq this-command 'expand-abbrev) (eql ?\s last-command-event)))
-
 (defun tempo-extra-user-elements (element)
   "Additional user elements.
 For ELEMENT see `tempo-define-template'."
@@ -109,8 +105,9 @@ For ELEMENT see `tempo-define-template'."
 
     (:elisp-prefix
      (let ((prefix (concat (tempo-extra-user-elements :elisp-namespace) "-")))
-       (or (car (cl-find prefix read-symbol-shorthands
-                         :key #'cdr :test #'string=))
+       (or (when (bound-and-true-p read-symbol-shorthands)
+             (car (cl-find prefix read-symbol-shorthands
+                           :key #'cdr :test #'string=)))
            prefix)))
 
     (:elisp-group
@@ -124,9 +121,10 @@ For ELEMENT see `tempo-define-template'."
     ;; Org
     (:changelog-last-version
      (save-excursion
-       (goto-char (point-min))
-       (search-forward-regexp (rx bol "** [" (group (+ (not (in "]\n")))) "]"))
-       (substring-no-properties (match-string 1))))
+       (save-match-data
+         (goto-char (point-min))
+         (search-forward-regexp (rx bol "** [" (group (+ (not (in "]\n")))) "]"))
+         (substring-no-properties (match-string 1)))))
 
     (:date (format-time-string "%Y-%m-%d"))))
 
