@@ -23,16 +23,32 @@
 
 (require 'tempo-extra)
 
-(te-define "changelog" 'org-mode
-  '("** [" :changelog-last-version p "] - Unreleased" n n
-    "*** Added" n n
-    "*** Changed" n n
-    "*** Deprecated" n n
-    "*** Removed" n n
-    "*** Fixed" n n
-    "*** Security"))
+(defun te-org-changelog-file-p ()
+  "Check whether current buffer is associated with changelog file."
+  (when-let ((file-name (buffer-file-name)))
+    (equal "CHANGELOG.org" (file-name-nondirectory file-name))))
 
-(te-define "Unreleased" 'org-mode '(:date))
+(defun te-org-set-enable-function (hook name enable-function)
+  "Set ENABLE-FUNCTION of abbrev with NAME.
+HOOK is used to find abbrev table."
+  (let* ((abbrev-table (symbol-value (get hook 'abbrev-hook-table)))
+         (abbrev (obarray-get abbrev-table name)))
+    (abbrev-put abbrev :enable-function enable-function)))
+
+(let* ((name "changelog")
+       (hook (te-define name 'org-mode
+               '("** [" :changelog-last-version p "] - Unreleased" n n
+                 "*** Added" n n
+                 "*** Changed" n n
+                 "*** Deprecated" n n
+                 "*** Removed" n n
+                 "*** Fixed" n n
+                 "*** Security"))))
+  (te-org-set-enable-function hook name #'tempo-extra-org-changelog-file-p))
+
+(let* ((name "Unreleased")
+       (hook (te-define name 'org-mode '(:date))))
+  (te-org-set-enable-function hook name #'tempo-extra-org-changelog-file-p))
 
 (provide 'tempo-extra-org)
 
