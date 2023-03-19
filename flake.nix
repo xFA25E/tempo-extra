@@ -4,89 +4,36 @@
   inputs = {
     eldev.flake = false;
     eldev.url = "github:doublep/eldev/1.3.1";
-
     emacs-overlay.inputs.nixpkgs.follows = "nixpkgs";
+    emacs-overlay.url = "github:nix-community/emacs-overlay";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    std.inputs.nixpkgs.follows = "nixpkgs";
+    std.url = "github:divnix/std";
 
     epkg-abbrev-hook.inputs.eldev.follows = "eldev";
     epkg-abbrev-hook.inputs.emacs-overlay.follows = "emacs-overlay";
     epkg-abbrev-hook.inputs.nixpkgs.follows = "nixpkgs";
+    epkg-abbrev-hook.inputs.std.follows = "std";
     epkg-abbrev-hook.url = "github:xFA25E/abbrev-hook";
   };
 
   outputs = {
+    std,
     self,
-    eldev,
-    emacs-overlay,
-    epkg-abbrev-hook,
-    nixpkgs,
-  }: let
-    system = "x86_64-linux";
-    pkgs = import nixpkgs {
-      inherit system;
-      overlays = [self.overlays.eldev];
+    ...
+  } @ inputs:
+    std.growOn {
+      inherit inputs;
+      cellsFrom = ./nix;
+      cellBlocks = with std.blockTypes; [
+        (functions "lib")
+        (installables "packages")
+        (installables "devshells")
+      ];
+    }
+    {
+      devShells = std.harvest self ["automation" "devshells"];
+      packages = std.harvest self ["main" "packages"];
+      checks = std.harvest self [["automation" "packages"] ["main" "packages"]];
     };
-
-    inherit (builtins) attrNames elemAt foldl' head map match readDir readFile;
-    inherit (builtins) stringLength tail;
-    inherit (pkgs.lib.lists) filter;
-    inherit (pkgs.lib.strings) hasSuffix removeSuffix;
-    parse = pkgs.callPackage "${emacs-overlay}/parse.nix" {};
-
-    names = filter (hasSuffix ".el") (attrNames (readDir self));
-    name = removeSuffix ".el" (foldl' (acc: elm:
-      if (stringLength elm) < (stringLength acc)
-      then elm
-      else acc) (head names) (tail names));
-    mainFile = readFile "${self}/${name}.el";
-
-    version = elemAt (match ".*\n;; Version: ([^\n]+).*" mainFile) 0;
-    url = elemAt (match ".*\n;; URL: ([^\n]+).*" mainFile) 0;
-    deps = parse.parsePackagesFromPackageRequires mainFile;
-  in {
-    overlays = {
-      default = final: prev:
-        (final: prev: {
-          emacsPackagesFor = emacs:
-            (prev.emacsPackagesFor emacs).overrideScope' (
-              efinal: eprev: {
-                ${name} = efinal.melpaBuild {
-                  inherit version;
-                  pname = name;
-                  src = self;
-                  commit = self.rev;
-                  recipe = final.writeText "recipe" ''
-                    (${name} :fetcher git :url "${url}")
-                  '';
-                  packageRequires = map (dep: efinal.${dep}) deps;
-                };
-              }
-            );
-        })
-        final (epkg-abbrev-hook.overlays.default final prev);
-
-      eldev = final: prev: {
-        eldev = final.stdenv.mkDerivation {
-          name = "eldev";
-          src = eldev;
-          dontUnpack = true;
-          dontPatch = true;
-          dontConfigure = true;
-          dontBuild = true;
-          nativeBuildInputs = [final.emacs];
-          installPhase = ''
-            mkdir -p $out/bin
-            cp $src/bin/eldev $out/bin/
-          '';
-        };
-      };
-    };
-
-    devShells.${system}.default = pkgs.mkShell {
-      inherit name;
-      buildInputs = [pkgs.alejandra pkgs.eldev pkgs.statix];
-      shellHook = ''
-        export ELDEV_DIR=$PWD/.eldev
-      '';
-    };
-  };
 }

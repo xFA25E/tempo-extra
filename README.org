@@ -1,5 +1,7 @@
 #+TITLE: tempo-extra
 
+[[https://github.com/xFA25E/tempo-extra/actions/workflows/test.yml/badge.svg]]
+
 This package provides additional tempo configurations and templates for various
 modes.
 
